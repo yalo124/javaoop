@@ -1,63 +1,85 @@
-import java.util.LinkedHashMap;
 import java.util.Scanner;
 
 public class QUIAMBAO {
-    public static void main(String[] args){
-        var Item = new LinkedHashMap<String, Double>();
-        var FinalItem = new LinkedHashMap<String, Double>();
 
-        var scan = new Scanner(System.in);
-        double priceItem = 0;
-        int quantity;
-        double pricePerUnit;
-        int totalQuantity = 0;
-        double PriceTotal = 0;
+    public static void main(String[] args){
+        Item item = new Item();
+        Scanner scan = new Scanner(System.in);
+
+        String productName;
+        double priceUnit;
+        int quantity, allProductQuantity, cash;
+        String choose;
 
         while(true) {
-            System.out.print("Enter item (if done adding item, type done: ");
-            String name = scan.nextLine();
-            if(name.equalsIgnoreCase("done")){
+            System.out.print("Enter item: ");
+            productName = scan.nextLine();
+
+            System.out.print("Enter price unit: ");
+            priceUnit = scan.nextDouble();
+
+            item.itemsWithUnitPrice(productName, priceUnit);
+
+            System.out.print("Enter Quantity: ");
+            quantity = scan.nextInt();
+
+            allProductQuantity = item.getTotalQuantity(quantity);
+            item.itemsWithQuantity(productName, quantity);
+
+
+            System.out.print("Add another? (y/n):");
+            choose = scan.next();
+            if (choose.equalsIgnoreCase("n")){
                 break;
             }
-            System.out.print("Enter unit price: ");
-            double Unit_price = scan.nextDouble();
             scan.nextLine();
 
-            Item.put(name, Unit_price);
+        }
+        System.out.println("Total: " + item.getTotalPrice());
+        System.out.print("Pay: ");
+        cash = scan.nextInt();
+        while(cash < item.getTotalPrice()){
+            try {
+                throw new ArithmeticException("Invalid amount!");
+            } catch (ArithmeticException e) {
+                System.out.println(e.getMessage());
+                System.out.print("Pay again: ");
+                cash = scan.nextInt();
+            }
         }
 
-        for (String i : Item.keySet()){
-            System.out.println("Item: " + i + " Price: P"+ Item.get(i));
+        System.out.println("\nOFFICIAL RECEIPT");
+        System.out.println("----------------------------------");
+        for (String i : item.getitemsWithUnitPrice().keySet()) {
+            System.out.printf("%-17s: ₱ %.2f%n", i.substring(0,1).toUpperCase() + i.substring(1).toLowerCase() , item.getPrice(i));
         }
+        System.out.println("----------------------------------");
+        System.out.printf("%-17s: ₱ %.2f%n", "Total Price", item.getTotalPrice());
+        System.out.printf("%-17s: ₱ %d%n", "Cash", cash);
+        System.out.printf("%-17s: ₱ %.2f%n", "Change", item.getchange(cash));
+        System.out.println();
+        System.out.printf("%-17s: %d%n", "No of Items", allProductQuantity);
+        System.out.println();
+        System.out.printf("%-17s: ₱ %.2f%n", "Price before VAT", item.getPriceBeforeVAT());
+        System.out.printf("%-17s: ₱ %.2f%n", "VAT", item.getVAT());
 
-        System.out.println("Enter quantity");
-        for (String i : Item.keySet()){
-            System.out.print("Item: " + i + ": ");
-            quantity= scan.nextByte();
-            pricePerUnit = Item.get(i);
-            priceItem = pricePerUnit * quantity;
 
-            totalQuantity+=quantity;
-            PriceTotal += priceItem;
-
-
-            FinalItem.put(i, priceItem);
+        System.out.println("\n\n*** INTERNATIONAL BOOKSTORE ***");
+        System.out.println("\t\tSales Invoice");
+        System.out.println("----------------------------------------");
+        for (String i : item.getitemsWithUnitPrice().keySet()) {
+            System.out.printf("%2d %-10s @ %6.2f  : ₱ %8.2f%n",
+                    item.getItemQuantity(i), i.substring(0,1).toUpperCase() + i.substring(1).toLowerCase(), item.getitemsWithUnitPrice().get(i), item.getPrice(i));
         }
+        System.out.println("----------------------------------------");
+        System.out.printf("%-24s: ₱ %.2f%n", "TOTAL", item.getTotalPrice());
+        System.out.printf("%-24s: ₱ %d%n", "Cash", cash);
+        System.out.printf("%-24s: ₱ %.2f%n", "Change", item.getchange(cash));
+        System.out.println();
+        System.out.printf("%-24s: ₱ %.2f%n", "Price before VAT", item.getPriceBeforeVAT());
+        System.out.printf("%-24s: ₱ %.2f%n", "VAT (12%%)", item.getVAT());
+        System.out.printf("%-24s: %d%n", "Total Number of Items", allProductQuantity);
 
-        for (String j : FinalItem.keySet()){
-            System.out.println("Item: " + j + " Total: P"+ FinalItem.get(j));
-        }
-        System.out.print("Cash: ");
-        int cash = scan.nextInt();
-        double change = cash - PriceTotal;
-        double PriceBeforeVat = PriceTotal / (1+0.12);
-        double VAT = PriceTotal - PriceBeforeVat;
-        System.out.println("Price before Vat: " + String.format("%.2f", PriceBeforeVat));
-        System.out.println("VAT (12%): " + String.format("%.2f", VAT));
-        System.out.println("No of items: " + totalQuantity);
-        System.out.println("Total Price: " +  PriceTotal);
-        System.out.println("Cash: " + cash);
-        System.out.println("Change: " + change);
 
     }
 }
