@@ -1,14 +1,87 @@
+import java.util.LinkedHashMap;
 import java.util.Scanner;
 
 public class QUIAMBAO {
+
+    public static class Item{
+        private LinkedHashMap<String, Double> itemsWithUnitPrice;
+        private LinkedHashMap<String, Integer> itemsWithQuantity;
+
+        private int TotalQuantity;
+
+
+        public Item(){
+            itemsWithUnitPrice = new LinkedHashMap<>();
+            itemsWithQuantity = new LinkedHashMap<>();
+
+            TotalQuantity = 0;
+        }
+
+        public int getTotalQuantity(int quantity){
+            return TotalQuantity += quantity;
+        }
+
+        public LinkedHashMap<String, Double> getitemsWithUnitPrice() {
+            return itemsWithUnitPrice;
+        }
+
+        public LinkedHashMap<String, Integer> getitemsWithQuantity() {
+            return itemsWithQuantity;
+        }
+
+        public void itemsWithUnitPrice(String productName, double priceUnit) {
+            itemsWithUnitPrice.put(productName, priceUnit);
+        }
+
+        public void itemsWithQuantity(String productName, int quantity){
+            itemsWithQuantity.put(productName, quantity);
+        }
+
+        public double getPrice(String productName){
+            return itemsWithUnitPrice.get(productName) * itemsWithQuantity.get(productName);
+        }
+
+
+        public double getTotalPrice() {
+            double total = 0;
+
+            for (String productName : itemsWithUnitPrice.keySet()) {
+                total += itemsWithUnitPrice.get(productName)
+                        * itemsWithQuantity.get(productName);
+            }
+            return total;
+        }
+
+        public int getItemQuantity(String productName){
+            if (itemsWithQuantity.containsKey(productName)) {
+                return itemsWithQuantity.get(productName);
+            }
+
+            return 0;
+        }
+
+
+        public double getchange(double cash){
+            return cash - getTotalPrice();
+        }
+
+        public double getPriceBeforeVAT(){
+            return getTotalPrice() / 1.12;
+        }
+
+        public double getVAT(){
+            return getTotalPrice() - getPriceBeforeVAT();
+        }
+
+    }
 
     public static void main(String[] args){
         Item item = new Item();
         Scanner scan = new Scanner(System.in);
 
         String productName;
-        double priceUnit;
-        int quantity, allProductQuantity, cash;
+        double priceUnit, cash;
+        int quantity, allProductQuantity ;
         String choose;
 
         while(true) {
@@ -26,25 +99,23 @@ public class QUIAMBAO {
             allProductQuantity = item.getTotalQuantity(quantity);
             item.itemsWithQuantity(productName, quantity);
 
-
             System.out.print("Add another? (y/n):");
             choose = scan.next();
             if (choose.equalsIgnoreCase("n")){
                 break;
             }
             scan.nextLine();
-
         }
         System.out.println("Total: " + item.getTotalPrice());
         System.out.print("Pay: ");
-        cash = scan.nextInt();
+        cash = scan.nextDouble();
         while(cash < item.getTotalPrice()){
             try {
                 throw new ArithmeticException("Invalid amount!");
             } catch (ArithmeticException e) {
                 System.out.println(e.getMessage());
                 System.out.print("Pay again: ");
-                cash = scan.nextInt();
+                cash = scan.nextDouble();
             }
         }
 
@@ -55,7 +126,7 @@ public class QUIAMBAO {
         }
         System.out.println("----------------------------------");
         System.out.printf("%-17s: ₱ %.2f%n", "Total Price", item.getTotalPrice());
-        System.out.printf("%-17s: ₱ %d%n", "Cash", cash);
+        System.out.printf("%-17s: ₱ %.2f%n", "Cash", cash);
         System.out.printf("%-17s: ₱ %.2f%n", "Change", item.getchange(cash));
         System.out.println();
         System.out.printf("%-17s: %d%n", "No of Items", allProductQuantity);
@@ -73,7 +144,7 @@ public class QUIAMBAO {
         }
         System.out.println("----------------------------------------");
         System.out.printf("%-24s: ₱ %.2f%n", "TOTAL", item.getTotalPrice());
-        System.out.printf("%-24s: ₱ %d%n", "Cash", cash);
+        System.out.printf("%-24s: ₱ %.2f%n", "Cash", cash);
         System.out.printf("%-24s: ₱ %.2f%n", "Change", item.getchange(cash));
         System.out.println();
         System.out.printf("%-24s: ₱ %.2f%n", "Price before VAT", item.getPriceBeforeVAT());
@@ -81,5 +152,6 @@ public class QUIAMBAO {
         System.out.printf("%-24s: %d%n", "Total Number of Items", allProductQuantity);
 
 
+        scan.close();
     }
 }
